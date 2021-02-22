@@ -5,8 +5,7 @@
  */
 package speaker;
 
-import SmartHouse.Planer;
-import SmartHouse.PlayHistory;
+import smarthouse.PlayHistory;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

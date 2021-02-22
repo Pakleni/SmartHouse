@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package SmartHouse;
+package smarthouse;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -25,14 +25,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author pakleni
  */
 @Entity
-@Table(name = "DatedAlarm")
+@Table(name = "PlanerAlarm")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "DatedAlarm.findAll", query = "SELECT d FROM DatedAlarm d"),
-    @NamedQuery(name = "DatedAlarm.findByIdAlarmPlaner", query = "SELECT d FROM DatedAlarm d WHERE d.idAlarmPlaner = :idAlarmPlaner"),
-    @NamedQuery(name = "DatedAlarm.findByDatetime", query = "SELECT d FROM DatedAlarm d WHERE d.datetime = :datetime"),
-    @NamedQuery(name = "DatedAlarm.findByIdUsers", query = "SELECT d FROM DatedAlarm d WHERE d.idUsers = :idUsers")})
-public class DatedAlarm implements Serializable {
+    @NamedQuery(name = "PlanerAlarm.findAll", query = "SELECT p FROM PlanerAlarm p"),
+    @NamedQuery(name = "PlanerAlarm.findByIdAlarmPlaner", query = "SELECT p FROM PlanerAlarm p WHERE p.idAlarmPlaner = :idAlarmPlaner"),
+    @NamedQuery(name = "PlanerAlarm.findByDatetime", query = "SELECT p FROM PlanerAlarm p WHERE p.datetime = :datetime"),
+    @NamedQuery(name = "PlanerAlarm.findByIdUsers", query = "SELECT p FROM PlanerAlarm p WHERE p.idUsers = :idUsers")})
+public class PlanerAlarm implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -48,14 +48,14 @@ public class DatedAlarm implements Serializable {
     @Column(name = "idUsers")
     private int idUsers;
 
-    public DatedAlarm() {
+    public PlanerAlarm() {
     }
 
-    public DatedAlarm(Integer idAlarmPlaner) {
+    public PlanerAlarm(Integer idAlarmPlaner) {
         this.idAlarmPlaner = idAlarmPlaner;
     }
 
-    public DatedAlarm(Integer idAlarmPlaner, Date datetime, int idUsers) {
+    public PlanerAlarm(Integer idAlarmPlaner, Date datetime, int idUsers) {
         this.idAlarmPlaner = idAlarmPlaner;
         this.datetime = datetime;
         this.idUsers = idUsers;
@@ -95,10 +95,10 @@ public class DatedAlarm implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof DatedAlarm)) {
+        if (!(object instanceof PlanerAlarm)) {
             return false;
         }
-        DatedAlarm other = (DatedAlarm) object;
+        PlanerAlarm other = (PlanerAlarm) object;
         if ((this.idAlarmPlaner == null && other.idAlarmPlaner != null) || (this.idAlarmPlaner != null && !this.idAlarmPlaner.equals(other.idAlarmPlaner))) {
             return false;
         }
@@ -107,7 +107,7 @@ public class DatedAlarm implements Serializable {
 
     @Override
     public String toString() {
-        return "SmartHouse.DatedAlarm[ idAlarmPlaner=" + idAlarmPlaner + " ]";
+        return "SmartHouse.PlanerAlarm[ idAlarmPlaner=" + idAlarmPlaner + " ]";
     }
     
 }

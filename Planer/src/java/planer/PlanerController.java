@@ -1,8 +1,8 @@
 package planer;
 
-import SmartHouse.Planer;
-import SmartHouse.DatedAlarm;
-import SmartHouse.Users;
+import smarthouse.Planer;
+import smarthouse.DatedAlarm;
+import smarthouse.Users;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;

@@ -5,9 +5,9 @@
  */
 package alarm;
 
-import SmartHouse.Alarm;
-import SmartHouse.AlarmSound;
-import SmartHouse.DatedAlarm;
+import smarthouse.Alarm;
+import smarthouse.AlarmSound;
+import smarthouse.DatedAlarm;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
