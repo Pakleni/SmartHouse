@@ -5,6 +5,7 @@
  */
 package endpoints;
 
+import filters.BasicAuthFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -20,10 +21,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
+import resources.smarthouse.Users;
 
 /**
  *
@@ -46,12 +48,16 @@ public class PlanerPage {
     
     @GET
     @Path("create")
-    public Response Create(@QueryParam("duration") int duration,
+    public Response Create(ContainerRequestContext requestContext, @QueryParam("duration") int duration,
                              @QueryParam("name") String name,
                              @QueryParam("location") String location,
                              @QueryParam("time") long time){
         
-        int userID = 1;
+        Users user = BasicAuthFilter.get_user(requestContext, em);
+        
+        if (user == null) {return null;}
+        
+        int userID = user.getIdUsers();
         
         JMSContext context=connectionFactory.createContext();
         JMSConsumer consumer= context.createConsumer(responseQueue, "userID = " + userID);
@@ -101,9 +107,13 @@ public class PlanerPage {
     
     @GET
     @Path("read")
-    public Response Read(){
+    public Response Read(ContainerRequestContext requestContext){
         
-        int userID = 1;
+        Users user = BasicAuthFilter.get_user(requestContext, em);
+        
+        if (user == null) {return null;}
+        
+        int userID = user.getIdUsers();
         
         JMSContext context=connectionFactory.createContext();
         JMSConsumer consumer= context.createConsumer(responseQueue, "userID = " + userID);
@@ -147,13 +157,17 @@ public class PlanerPage {
     
     @GET
     @Path("update")
-    public Response Update(@QueryParam("id") int id,
+    public Response Update(ContainerRequestContext requestContext, @QueryParam("id") int id,
                            @QueryParam("duration") int duration,
                            @QueryParam("name") String name,
                            @QueryParam("location") String location,
                            @QueryParam("time") long time){
         
-        int userID = 1;
+        Users user = BasicAuthFilter.get_user(requestContext, em);
+        
+        if (user == null) {return null;}
+        
+        int userID = user.getIdUsers();
         
         JMSContext context=connectionFactory.createContext();
         JMSConsumer consumer= context.createConsumer(responseQueue, "userID = " + userID);
@@ -210,9 +224,13 @@ public class PlanerPage {
     
     @GET
     @Path("delete")
-    public Response Delete(@QueryParam("id") int id){
+    public Response Delete(ContainerRequestContext requestContext, @QueryParam("id") int id){
         
-        int userID = 1;
+        Users user = BasicAuthFilter.get_user(requestContext, em);
+        
+        if (user == null) {return null;}
+        
+        int userID = user.getIdUsers();
         
         JMSContext context=connectionFactory.createContext();
         
@@ -241,9 +259,13 @@ public class PlanerPage {
     
     @GET
     @Path("alarm")
-    public Response Alarm(@QueryParam("id") int id){
+    public Response Alarm(ContainerRequestContext requestContext, @QueryParam("id") int id){
         
-        int userID = 1;
+        Users user = BasicAuthFilter.get_user(requestContext, em);
+        
+        if (user == null) {return null;}
+        
+        int userID = user.getIdUsers();
         
         JMSContext context=connectionFactory.createContext();
         

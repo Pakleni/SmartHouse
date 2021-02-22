@@ -71,6 +71,8 @@ public class PlanerController {
     
     private static void respond (boolean good, int userID) {
         
+        System.out.println(good);
+        
         JSONObject obj = new JSONObject();
         
         obj.put("good", good);
@@ -117,7 +119,7 @@ public class PlanerController {
         
         boolean good = false;
         
-        if (!isGood(planer, em)){
+        if (isGood(planer, em)){
             try{
                 EntityTransaction transaction = em.getTransaction();
                 
@@ -229,7 +231,7 @@ public class PlanerController {
         
         boolean good = false;
         
-        if (!isGood(planer, em)){
+        if (isGood(planer, em)){
             try{    
                 EntityTransaction transaction = em.getTransaction();
 
@@ -289,46 +291,63 @@ public class PlanerController {
     
     private static Planer getPreviousEngagement(Planer planer, EntityManager em) {
         
-        String query = "SELECT p FROM Planer p WHERE p.start < :start AND p.idPlanner != :id ORDER by p.start DESC";
+        String query;
+        TypedQuery<Planer> tq;
         
-        TypedQuery<Planer> tq = em.createQuery(query, Planer.class);
-        
-        tq.setMaxResults(1);
+        if (planer.getIdPlanner()!= null) {
+            query = "SELECT p FROM Planer p WHERE p.start <= :start AND p.idPlanner != :id ORDER by p.start DESC";
+            tq = em.createQuery(query, Planer.class);
+            tq.setParameter("id", planer.getIdPlanner());
+        }
+        else {
+            query = "SELECT p FROM Planer p WHERE p.start <= :start ORDER by p.start DESC";
+            tq = em.createQuery(query, Planer.class);
+        }
         
         tq.setParameter("start", planer.getStart());
-        tq.setParameter("id", planer.getIdPlanner());
+        tq.setMaxResults(1);
         
-        Planer p = null;
-        try {
-            p = tq.getSingleResult();
-        }
-        catch(javax.persistence.NoResultException e) {
-            
-        }
+        List<Planer> ps = tq.getResultList();
         
-        return p;
+        
+        if (!ps.isEmpty()) {
+            return ps.get(0);
+        }
+        else {
+            return null;
+        }
     }
     
     private static Planer getNextEngagement(Planer planer, EntityManager em) {
         
-        String query = "SELECT p FROM Planer p WHERE p.start > :start AND p.idPlanner != :id ORDER by p.start ASC";
+        String query;
+        TypedQuery<Planer> tq;
         
-        TypedQuery<Planer> tq = em.createQuery(query, Planer.class);
-        
-        tq.setMaxResults(1);
+        if (planer.getIdPlanner()!= null) {
+            query = "SELECT p FROM Planer p WHERE p.start > :start AND p.idPlanner != :id ORDER by p.start DESC";
+            tq = em.createQuery(query, Planer.class);
+            tq.setParameter("id", planer.getIdPlanner());
+        }
+        else {
+            query = "SELECT p FROM Planer p WHERE p.start > :start ORDER by p.start DESC";
+            tq = em.createQuery(query, Planer.class);
+        }
         
         tq.setParameter("start", planer.getStart());
-        tq.setParameter("id", planer.getIdPlanner());
+        tq.setMaxResults(1);
         
-        Planer p = null;
-        try {
-            p = tq.getSingleResult();
+        List<Planer> ps = tq.getResultList();
+        
+        
+        if (!ps.isEmpty()) {
+//            System.out.println(planer.getStart());
+//            System.out.println(ps.get(0).getStart());
+            return ps.get(0);
         }
-        catch(javax.persistence.NoResultException e) {
-            
+        else {
+            return null;
         }
         
-        return p;
     }
     
     private static long getOffset(Planer planer, Planer prev, EntityManager em) {

@@ -107,7 +107,7 @@ public class DatedAlarm implements Serializable {
 
     @Override
     public String toString() {
-        return "SmartHouse.DatedAlarm[ idAlarmPlaner=" + idAlarmPlaner + " ]";
+        return "smarthouse.DatedAlarm[ idAlarmPlaner=" + idAlarmPlaner + " ]";
     }
     
 }

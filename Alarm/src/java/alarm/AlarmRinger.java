@@ -33,17 +33,7 @@ import org.json.simple.JSONObject;
  */
 public class AlarmRinger extends Thread{
     
-    @Resource(lookup="jms/__defaultConnectionFactory")
-    private static ConnectionFactory connectionFactory;
-    
-    @Resource(lookup="SpeakerQ")
-    private static Queue zvukQ;
-    
-    
-    private static void ring (int user) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("AlarmPU");
-        EntityManager em = emf.createEntityManager();
-        
+    private static void ring (int user, EntityManager em) {
         AlarmSound sound = em.find(AlarmSound.class, user);
         
         if (sound == null) {
@@ -56,7 +46,7 @@ public class AlarmRinger extends Thread{
     
     private static void ring(int user, String query) {
         try {
-            JMSContext context=connectionFactory.createContext();
+            JMSContext context= AlarmController.connectionFactory.createContext();
             JMSProducer producer = context.createProducer();
 
             TextMessage msg=context.createTextMessage();
@@ -68,7 +58,7 @@ public class AlarmRinger extends Thread{
             
             
             msg.setText(obj.toJSONString());
-            producer.send(zvukQ, msg);
+            producer.send(AlarmController.zvukQ, msg);
             
         } catch (JMSException ex) {
             Logger.getLogger(AlarmController.class.getName()).log(Level.SEVERE, null, ex);
@@ -89,6 +79,9 @@ public class AlarmRinger extends Thread{
         
         List<Alarm> alarms = query.getResultList();
         
+        for (Alarm alarm: alarms) {
+            ring(alarm.getIdUsers(), em);
+        }
         
         try{
             
@@ -97,7 +90,7 @@ public class AlarmRinger extends Thread{
             transaction.begin();
 
             for (Alarm alarm: alarms) {
-                if (alarm.getOn() == AlarmController.AlarmStatus.ON.ordinal()){
+                if (alarm.getPeriodic() == AlarmController.AlarmStatus.ON.ordinal()){
                     em.remove(alarm);
                 }
             }
@@ -123,7 +116,7 @@ public class AlarmRinger extends Thread{
         List<DatedAlarm> alarms = query.getResultList();
         
         for (DatedAlarm alarm: alarms) {
-            ring(alarm.getIdUsers());
+            ring(alarm.getIdUsers(), em);
         }
         
         try{

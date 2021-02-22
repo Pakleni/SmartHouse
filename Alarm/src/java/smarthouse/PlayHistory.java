@@ -103,7 +103,7 @@ public class PlayHistory implements Serializable {
 
     @Override
     public String toString() {
-        return "SmartHouse.PlayHistory[ idPlayHistory=" + idPlayHistory + " ]";
+        return "smarthouse.PlayHistory[ idPlayHistory=" + idPlayHistory + " ]";
     }
     
 }

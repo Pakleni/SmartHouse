@@ -100,7 +100,7 @@ public class AlarmSound implements Serializable {
 
     @Override
     public String toString() {
-        return "SmartHouse.AlarmSound[ idUsers=" + idUsers + " ]";
+        return "smarthouse.AlarmSound[ idUsers=" + idUsers + " ]";
     }
     
 }

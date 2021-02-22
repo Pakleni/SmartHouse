@@ -5,6 +5,7 @@
  */
 package endpoints;
 
+import filters.BasicAuthFilter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -21,8 +22,10 @@ import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
+import resources.smarthouse.Users;
 
 /**
  *
@@ -45,9 +48,13 @@ public class SpeakerPage {
     
     @GET
     @Path("play/{query}")
-    public Response PlaySong(@PathParam("query") String query){
+    public Response PlaySong(ContainerRequestContext requestContext, @PathParam("query") String query){
         
-        int userID = 1;
+        Users user = BasicAuthFilter.get_user(requestContext, em);
+        
+        if (user == null) {return null;}
+        
+        int userID = user.getIdUsers();
         
         try {
             JMSContext context=connectionFactory.createContext();
@@ -74,8 +81,12 @@ public class SpeakerPage {
     
     @GET
     @Path("history")
-    public Response GetHistory(){
-        int userID = 1;
+    public Response GetHistory(ContainerRequestContext requestContext){
+        Users user = BasicAuthFilter.get_user(requestContext, em);
+        
+        if (user == null) {return null;}
+        
+        int userID = user.getIdUsers();
         
         JMSContext context=connectionFactory.createContext();
         JMSProducer producer = context.createProducer();

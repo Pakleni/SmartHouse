@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Alarm.findByIdAlarm", query = "SELECT a FROM Alarm a WHERE a.idAlarm = :idAlarm"),
     @NamedQuery(name = "Alarm.findByIdUsers", query = "SELECT a FROM Alarm a WHERE a.idUsers = :idUsers"),
     @NamedQuery(name = "Alarm.findByTime", query = "SELECT a FROM Alarm a WHERE a.time = :time"),
-    @NamedQuery(name = "Alarm.findByOn", query = "SELECT a FROM Alarm a WHERE a.on = :on")})
+    @NamedQuery(name = "Alarm.findByPeriodic", query = "SELECT a FROM Alarm a WHERE a.periodic = :periodic")})
 public class Alarm implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,8 +45,8 @@ public class Alarm implements Serializable {
     @Column(name = "time")
     private int time;
     @Basic(optional = false)
-    @Column(name = "on")
-    private int on;
+    @Column(name = "periodic")
+    private int periodic;
 
     public Alarm() {
     }
@@ -55,11 +55,11 @@ public class Alarm implements Serializable {
         this.idAlarm = idAlarm;
     }
 
-    public Alarm(Integer idAlarm, int idUsers, int time, int on) {
+    public Alarm(Integer idAlarm, int idUsers, int time, int periodic) {
         this.idAlarm = idAlarm;
         this.idUsers = idUsers;
         this.time = time;
-        this.on = on;
+        this.periodic = periodic;
     }
 
     public Integer getIdAlarm() {
@@ -86,12 +86,12 @@ public class Alarm implements Serializable {
         this.time = time;
     }
 
-    public int getOn() {
-        return on;
+    public int getPeriodic() {
+        return periodic;
     }
 
-    public void setOn(int on) {
-        this.on = on;
+    public void setPeriodic(int periodic) {
+        this.periodic = periodic;
     }
 
     @Override
@@ -116,7 +116,7 @@ public class Alarm implements Serializable {
 
     @Override
     public String toString() {
-        return "SmartHouse.Alarm[ idAlarm=" + idAlarm + " ]";
+        return "smarthouse.Alarm[ idAlarm=" + idAlarm + " ]";
     }
     
 }

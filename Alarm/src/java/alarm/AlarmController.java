@@ -40,10 +40,13 @@ public class AlarmController {
       }
     
     @Resource(lookup="jms/__defaultConnectionFactory")
-    private static ConnectionFactory connectionFactory;
+    static ConnectionFactory connectionFactory;
     
     @Resource(lookup="AlarmQ")
-    private static Queue myQueue;  
+    private static Queue myQueue;
+    
+    @Resource(lookup="SpeakerQ")
+    static Queue zvukQ;
     
     public static void setDated(JSONObject jo) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
@@ -84,9 +87,9 @@ public class AlarmController {
             alarm.setIdUsers(((Long)obj.get("user")).intValue());
             
             if (obj.containsKey("periodic") && (boolean)obj.get("periodic"))
-                alarm.setOn(AlarmStatus.PERIODIC.ordinal());
+                alarm.setPeriodic(AlarmStatus.PERIODIC.ordinal());
             else 
-                alarm.setOn(AlarmStatus.ON.ordinal());
+                alarm.setPeriodic(AlarmStatus.ON.ordinal());
             
             alarm.setTime(((Long)obj.get("time")).intValue());
             
@@ -143,6 +146,10 @@ public class AlarmController {
     }
     
     public static void main(String[] args) {
+        
+        AlarmRinger ar= new AlarmRinger();
+        
+        ar.start();
         
         JMSContext context=connectionFactory.createContext();
         JMSConsumer consumer=context.createConsumer(myQueue);

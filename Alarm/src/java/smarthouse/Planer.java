@@ -144,7 +144,7 @@ public class Planer implements Serializable {
 
     @Override
     public String toString() {
-        return "SmartHouse.Planer[ idPlanner=" + idPlanner + " ]";
+        return "smarthouse.Planer[ idPlanner=" + idPlanner + " ]";
     }
     
 }

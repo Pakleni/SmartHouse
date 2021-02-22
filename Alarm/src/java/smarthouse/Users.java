@@ -128,7 +128,7 @@ public class Users implements Serializable {
 
     @Override
     public String toString() {
-        return "SmartHouse.Users[ idUsers=" + idUsers + " ]";
+        return "smarthouse.Users[ idUsers=" + idUsers + " ]";
     }
     
 }
