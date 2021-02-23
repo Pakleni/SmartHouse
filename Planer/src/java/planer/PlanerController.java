@@ -69,7 +69,7 @@ public class PlanerController {
         return true;
     }
     
-    private static void respond (boolean good, int userID) {
+    private static void respond (boolean good, int userID, JMSContext context, JMSProducer producer) {
         
         System.out.println(good);
         
@@ -78,12 +78,6 @@ public class PlanerController {
         obj.put("good", good);
         
         try {
-            //JMSContext context=connectionFactory.createContext();
-            //JMSConsumer consumer=context.createConsumer(myQueue, "userID="+userID);
-
-            JMSContext context=connectionFactory.createContext();
-            JMSProducer producer = context.createProducer();
-
             TextMessage msg=context.createTextMessage();
             
             msg.setText(obj.toJSONString());
@@ -96,7 +90,7 @@ public class PlanerController {
         }
     }
     
-    private static void create(JSONObject obj) {
+    private static void create(JSONObject obj,JMSContext context, JMSProducer producer) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
         EntityManager em = emf.createEntityManager();
 
@@ -139,13 +133,15 @@ public class PlanerController {
             }
         }
         
-        respond (good, userID);
+        respond (good, userID,context, producer);
     }
     
-    private static void read(JSONObject obj) {
+    private static void read(JSONObject obj,JMSContext context, JMSProducer producer) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
         EntityManager em = emf.createEntityManager();
-
+//        JMSContext context=connectionFactory.createContext();
+//        JMSProducer producer = context.createProducer();
+//        
         int userID = getInt(obj, "user");
         
         Date currDate = new Date();
@@ -174,11 +170,7 @@ public class PlanerController {
         }
         
         try {
-            //JMSContext context=connectionFactory.createContext();
-            //JMSConsumer consumer=context.createConsumer(myQueue, "userID="+userID);
-
-            JMSContext context=connectionFactory.createContext();
-            JMSProducer producer = context.createProducer();
+            
 
             TextMessage msg=context.createTextMessage();
             
@@ -196,7 +188,7 @@ public class PlanerController {
         
     }
     
-    private static void update(JSONObject obj) {
+    private static void update(JSONObject obj,JMSContext context, JMSProducer producer) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
         EntityManager em = emf.createEntityManager();
         
@@ -208,7 +200,7 @@ public class PlanerController {
    
         
         if(planer == null || planer.getIdUsers() != userID) {
-            respond (false, userID);
+            respond (false, userID, context, producer);
             return;
         }
         
@@ -251,7 +243,7 @@ public class PlanerController {
             }
         }
         
-        respond(good, userID);
+        respond(good, userID, context, producer);
     }
     
     private static void delete(JSONObject obj) {
@@ -446,6 +438,7 @@ public class PlanerController {
         
         JMSContext context=connectionFactory.createContext();
         JMSConsumer consumer=context.createConsumer(myQueue);
+        JMSProducer producer = context.createProducer();
         
         JSONParser parser = new JSONParser();
         
@@ -461,13 +454,13 @@ public class PlanerController {
                     if (obj.containsKey("user") && obj.containsKey("type")){
                         switch((String)obj.get("type")) {
                             case "C":
-                                create(obj);
+                                create(obj, context, producer);
                                 break;
                             case "R":
-                                read(obj);
+                                read(obj, context, producer);
                                 break;
                             case "U":
-                                update(obj);
+                                update(obj, context, producer);
                                 break;
                             case "D":
                                 delete(obj);

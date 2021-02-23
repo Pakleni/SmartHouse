@@ -49,7 +49,7 @@ public class AlarmController {
     static Queue zvukQ;
     
     public static void setDated(JSONObject jo) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("AlarmPU");
         EntityManager em = emf.createEntityManager();
         
         DatedAlarm planerAlarm = new DatedAlarm();
