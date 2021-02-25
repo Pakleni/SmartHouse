@@ -89,9 +89,14 @@ public class SmartHouseClient extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
-        username.setText("Pakleni");
+        username.setText("Username");
 
-        password.setText("glupasif");
+        password.setText("**********");
+        password.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                passwordActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout loginResponseLayout = new javax.swing.GroupLayout(loginResponse);
         loginResponse.setLayout(loginResponseLayout);
@@ -960,6 +965,10 @@ public class SmartHouseClient extends javax.swing.JFrame {
             Error err = new Error(this, true);
         }
     }//GEN-LAST:event_updatePlanButtonActionPerformed
+
+    private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_passwordActionPerformed
 
     /**
      * @param args the command line arguments
