@@ -161,7 +161,7 @@ public class PlanerController {
             curr.put("id", planer.getIdPlanner());
             curr.put("time", planer.getStart().getTime());            
             curr.put("duration", planer.getDuration());
-            
+            curr.put("name", planer.getName());
             if (planer.getDestination() != null) {
                 curr.put("location", planer.getDestination());
             }
@@ -287,15 +287,16 @@ public class PlanerController {
         TypedQuery<Planer> tq;
         
         if (planer.getIdPlanner()!= null) {
-            query = "SELECT p FROM Planer p WHERE p.start <= :start AND p.idPlanner != :id ORDER by p.start DESC";
+            query = "SELECT p FROM Planer p WHERE p.start <= :start AND p.idPlanner != :id AND p.idUsers = :idUsers ORDER by p.start DESC";
             tq = em.createQuery(query, Planer.class);
             tq.setParameter("id", planer.getIdPlanner());
         }
         else {
-            query = "SELECT p FROM Planer p WHERE p.start <= :start ORDER by p.start DESC";
+            query = "SELECT p FROM Planer p WHERE p.start <= :start AND p.idUsers = :idUsers ORDER by p.start DESC";
             tq = em.createQuery(query, Planer.class);
         }
         
+        tq.setParameter("idUsers", planer.getIdUsers());
         tq.setParameter("start", planer.getStart());
         tq.setMaxResults(1);
         
@@ -316,15 +317,16 @@ public class PlanerController {
         TypedQuery<Planer> tq;
         
         if (planer.getIdPlanner()!= null) {
-            query = "SELECT p FROM Planer p WHERE p.start > :start AND p.idPlanner != :id ORDER by p.start DESC";
+            query = "SELECT p FROM Planer p WHERE p.start > :start AND p.idPlanner != :id AND p.idUsers = :idUsers ORDER by p.start DESC";
             tq = em.createQuery(query, Planer.class);
             tq.setParameter("id", planer.getIdPlanner());
         }
         else {
-            query = "SELECT p FROM Planer p WHERE p.start > :start ORDER by p.start DESC";
+            query = "SELECT p FROM Planer p WHERE p.start > :start AND p.idUsers = :idUsers ORDER by p.start DESC";
             tq = em.createQuery(query, Planer.class);
         }
         
+        tq.setParameter("idUsers", planer.getIdUsers());
         tq.setParameter("start", planer.getStart());
         tq.setMaxResults(1);
         
