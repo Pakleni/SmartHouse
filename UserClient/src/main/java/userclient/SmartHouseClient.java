@@ -608,7 +608,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            con.setRequestMethod("GET");
+            con.setRequestMethod("POST");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             
