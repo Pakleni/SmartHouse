@@ -18,6 +18,7 @@ import javax.jms.TextMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -42,7 +43,7 @@ public class AlarmPage {
     @Resource(lookup="AlarmQ")
     private Queue myQueue;
     
-    @GET
+    @POST
     @Path("new")
     public Response SetAlarm(ContainerRequestContext requestContext,
                              @QueryParam("time") int time,
@@ -80,7 +81,7 @@ public class AlarmPage {
         return Response.status(Response.Status.OK).entity(text).build();
     }
     
-    @GET
+    @POST
     @Path("song/{query}")
     public Response SetSong(ContainerRequestContext requestContext, @PathParam("query") String query){
         

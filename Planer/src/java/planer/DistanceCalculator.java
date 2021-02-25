@@ -24,9 +24,21 @@ import org.json.simple.parser.ParseException;
  * @author pakleni
  */
 public class DistanceCalculator {
-    static String KEY = "XWeOJGKcfZsTInP2rH9AWAPPd2wDNfrz";
+    private static final String KEY = "XWeOJGKcfZsTInP2rH9AWAPPd2wDNfrz";
     
-    public static JSONObject getPath(String from, String to) {
+    protected DistanceCalculator() {}
+    
+    private static DistanceCalculator singleton = null;
+    
+    public static DistanceCalculator getInstance() {
+        if (singleton == null) {
+            singleton = new DistanceCalculator();
+        }
+        
+        return singleton;
+    }
+    
+    private JSONObject getPath(String from, String to) {
         URL url;
         try {
             String link = "http://www.mapquestapi.com/directions/v2/route"
@@ -63,21 +75,18 @@ public class DistanceCalculator {
         return null;  
     }
     
-    public static double getDistance(String from, String to) {
+    public double getDistance(String from, String to) {
         JSONObject ret = getPath(from, to);
         
         double distance = (double)ret.get("distance");
         return distance;
     }
     
-    public static long getTime(String from, String to) {
+    public long getTime(String from, String to) {
         JSONObject ret = getPath(from, to);
         
         long time = (long)ret.get("time");
         return time;
     }
-    
-    public static void main(String[] args) {
-        System.out.println(getTime("Dalmatinska 84, Beograd", "Patrijarha Dimitrija 151, Beograd"));
-    }
+
 }

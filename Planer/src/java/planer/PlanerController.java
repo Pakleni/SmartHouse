@@ -1,7 +1,6 @@
 package planer;
 
 import smarthouse.Planer;
-import smarthouse.DatedAlarm;
 import smarthouse.Users;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +31,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author pakleni
  */
-public class PlanerController {
+public class PlanerController extends Thread {
     
     @Resource(lookup="jms/__defaultConnectionFactory")
     private static ConnectionFactory connectionFactory;
@@ -46,30 +45,39 @@ public class PlanerController {
     @Resource(lookup="AlarmQ")
     private static Queue alarmQ;
     
-    private static int getInt(JSONObject obj, String key) {
+    public static PlanerController singleton = null;
+    
+    protected PlanerController(){
+        
+        context = connectionFactory.createContext();
+        producer = context.createProducer();
+    
+    }
+    
+    private int getInt(JSONObject obj, String key) {
         return ((Long)obj.get(key)).intValue();
     }
     
-    private static boolean calcGoodTime (Planer p1, Planer p2, EntityManager em) {
-        return (p1.getStart().getTime() + getOffset(p1, p2, em) + p1.getDuration() <= p2.getStart().getTime());
+    private boolean areNotOverlapped (Planer p1, Planer p2, EntityManager em) {
+        return (p1.getStart().getTime() + getTimeOffset(p1, p2, em) + p1.getDuration() <= p2.getStart().getTime());
     }
     
-    private static boolean isGood(Planer planer, EntityManager em) {
+    private boolean isPlanPossible(Planer planer, EntityManager em) {
         Planer prev = getPreviousEngagement(planer, em);
         Planer next = getNextEngagement(planer, em);
         
-        if (prev != null && !calcGoodTime (prev, planer, em)) {
+        if (prev != null && !areNotOverlapped (prev, planer, em)) {
             return false;
         }
         
-        if (next != null && !calcGoodTime (planer, next, em)) {
+        if (next != null && !areNotOverlapped (planer, next, em)) {
             return false;
         }
         
         return true;
     }
     
-    private static void respond (boolean good, int userID, JMSContext context, JMSProducer producer) {
+    private void respond (boolean good, int userID) {
         
         System.out.println(good);
         
@@ -90,7 +98,7 @@ public class PlanerController {
         }
     }
     
-    private static void create(JSONObject obj,JMSContext context, JMSProducer producer) {
+    private void create(JSONObject obj) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
         EntityManager em = emf.createEntityManager();
 
@@ -113,7 +121,7 @@ public class PlanerController {
         
         boolean good = false;
         
-        if (isGood(planer, em)){
+        if (isPlanPossible(planer, em)){
             try{
                 EntityTransaction transaction = em.getTransaction();
                 
@@ -133,14 +141,12 @@ public class PlanerController {
             }
         }
         
-        respond (good, userID,context, producer);
+        respond (good, userID);
     }
     
-    private static void read(JSONObject obj,JMSContext context, JMSProducer producer) {
+    private void read(JSONObject obj) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
         EntityManager em = emf.createEntityManager();
-//        JMSContext context=connectionFactory.createContext();
-//        JMSProducer producer = context.createProducer();
 //        
         int userID = getInt(obj, "user");
         
@@ -188,7 +194,7 @@ public class PlanerController {
         
     }
     
-    private static void update(JSONObject obj,JMSContext context, JMSProducer producer) {
+    private void update(JSONObject obj) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
         EntityManager em = emf.createEntityManager();
         
@@ -200,7 +206,7 @@ public class PlanerController {
    
         
         if(planer == null || planer.getIdUsers() != userID) {
-            respond (false, userID, context, producer);
+            respond (false, userID);
             return;
         }
         
@@ -223,7 +229,7 @@ public class PlanerController {
         
         boolean good = false;
         
-        if (isGood(planer, em)){
+        if (isPlanPossible(planer, em)){
             try{    
                 EntityTransaction transaction = em.getTransaction();
 
@@ -243,10 +249,10 @@ public class PlanerController {
             }
         }
         
-        respond(good, userID, context, producer);
+        respond(good, userID);
     }
     
-    private static void delete(JSONObject obj) {
+    private void delete(JSONObject obj) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
         EntityManager em = emf.createEntityManager();
         
@@ -281,7 +287,7 @@ public class PlanerController {
         }
     }
     
-    private static Planer getPreviousEngagement(Planer planer, EntityManager em) {
+    private Planer getPreviousEngagement(Planer planer, EntityManager em) {
         
         String query;
         TypedQuery<Planer> tq;
@@ -311,7 +317,7 @@ public class PlanerController {
         }
     }
     
-    private static Planer getNextEngagement(Planer planer, EntityManager em) {
+    private Planer getNextEngagement(Planer planer, EntityManager em) {
         
         String query;
         TypedQuery<Planer> tq;
@@ -344,7 +350,7 @@ public class PlanerController {
         
     }
     
-    private static long getOffset(Planer planer, Planer prev, EntityManager em) {
+    private long getTimeOffset(Planer planer, Planer prev, EntityManager em) {
         
         
         String pos1, pos2;
@@ -385,10 +391,10 @@ public class PlanerController {
         
         
         
-        return DistanceCalculator.getTime(pos1, pos2) * 1000;
+        return DistanceCalculator.getInstance().getTime(pos1, pos2) * 1000;
     }
     
-    private static void alarm(JSONObject obj) {
+    private void alarm(JSONObject obj) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("PlanerPU");
         EntityManager em = emf.createEntityManager();
         
@@ -410,7 +416,7 @@ public class PlanerController {
         
         Planer prev = getPreviousEngagement(planer, em);
         
-        time = (date.getTime() - getOffset(planer, prev,  em))/ (60 * 1000) * (60 * 1000);
+        time = (date.getTime() - getTimeOffset(planer, prev,  em))/ (60 * 1000) * (60 * 1000);
        
         
         jo.put("time", time);
@@ -436,11 +442,21 @@ public class PlanerController {
         
     }
     
-    public static void main(String[] args) {
+    private JMSContext context;
+    
+    private JMSProducer producer;
+    
+    public static PlanerController getInstance() {
+        if (singleton == null){
+            singleton = new PlanerController();
+        }
         
-        JMSContext context=connectionFactory.createContext();
-        JMSConsumer consumer=context.createConsumer(myQueue);
-        JMSProducer producer = context.createProducer();
+        return singleton;
+    }
+    
+    @Override
+    public void run() {
+        JMSConsumer consumer = singleton.context.createConsumer(myQueue);
         
         JSONParser parser = new JSONParser();
         
@@ -456,13 +472,13 @@ public class PlanerController {
                     if (obj.containsKey("user") && obj.containsKey("type")){
                         switch((String)obj.get("type")) {
                             case "C":
-                                create(obj, context, producer);
+                                create(obj);
                                 break;
                             case "R":
-                                read(obj, context, producer);
+                                read(obj);
                                 break;
                             case "U":
-                                update(obj, context, producer);
+                                update(obj);
                                 break;
                             case "D":
                                 delete(obj);
@@ -473,13 +489,18 @@ public class PlanerController {
                         }
                     }
                     
-                } catch (JMSException ex) {
-                    Logger.getLogger(PlanerController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
+                } catch (JMSException | ParseException ex) {
                     Logger.getLogger(PlanerController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
+    }
+    
+    public static void main(String[] args) {
+        
+        PlanerController pc = getInstance();
+        
+        pc.start();
     }
     
 }

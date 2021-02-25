@@ -31,7 +31,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author pakleni
  */
-public class AlarmController {
+public class AlarmController extends Thread{
     
     public enum AlarmStatus {
         OFF,
@@ -48,7 +48,19 @@ public class AlarmController {
     @Resource(lookup="SpeakerQ")
     static Queue zvukQ;
     
-    public static void setDated(JSONObject jo) {
+    protected AlarmController(){}
+    
+    private static AlarmController singleton = null;
+    
+    public static AlarmController getInstance(){
+        if (singleton == null){
+            singleton = new AlarmController();
+        }
+        
+        return singleton;
+    }
+    
+    private void setDated(JSONObject jo) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("AlarmPU");
         EntityManager em = emf.createEntityManager();
         
@@ -75,7 +87,7 @@ public class AlarmController {
         }
     }
     
-    public static void set(JSONObject obj) {
+    private void setAlarm(JSONObject obj) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("AlarmPU");
         EntityManager em = emf.createEntityManager();
         
@@ -108,7 +120,7 @@ public class AlarmController {
         }
     }
     
-    public static void config(JSONObject obj) {
+    private void setSong(JSONObject obj) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("AlarmPU");
         EntityManager em = emf.createEntityManager();
         
@@ -145,11 +157,9 @@ public class AlarmController {
         }
     }
     
-    public static void main(String[] args) {
-        
-        AlarmRinger ar= new AlarmRinger();
-        
-        ar.start();
+    @Override
+    public void run(){
+        AlarmRinger.getInstance().start();
         
         JMSContext context=connectionFactory.createContext();
         JMSConsumer consumer=context.createConsumer(myQueue);
@@ -168,13 +178,13 @@ public class AlarmController {
                     if (obj.containsKey("user") && obj.containsKey("type")){
                         switch((String)obj.get("type")) {
                             case "set":
-                                set(obj);
+                                setAlarm(obj);
                                 break;
                             case "dated":
                                 setDated(obj);
                                 break;
                             case "config":
-                                config(obj);
+                                setSong(obj);
                                 break;
                         }
                     }
@@ -186,6 +196,10 @@ public class AlarmController {
                 }
             }
         }
+    }
+    
+    public static void main(String[] args) {
+        getInstance().start();
     }
     
 }

@@ -541,7 +541,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            con.setRequestMethod("GET");
+            con.setRequestMethod("POST");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             
@@ -630,7 +630,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
         
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             
-            con.setRequestMethod("GET");
+            con.setRequestMethod("POST");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             
@@ -638,9 +638,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
             
             con.getInputStream();
             
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(SmartHouseClient.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ProtocolException ex) {
+        } catch (MalformedURLException | ProtocolException ex) {
             Logger.getLogger(SmartHouseClient.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Error err = new Error(this, true);
@@ -656,7 +654,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
         
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             
-            con.setRequestMethod("GET");
+            con.setRequestMethod("POST");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             
@@ -717,7 +715,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
         
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             
-            con.setRequestMethod("GET");
+            con.setRequestMethod("POST");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             
@@ -732,6 +730,9 @@ public class SmartHouseClient extends javax.swing.JFrame {
             
             if (!good) {
                 Error err = new Error(this, true, "You can't make it to this!");
+            }
+            else {
+                getPlansActionPerformed(evt);
             }
             
         } catch (MalformedURLException | ProtocolException | ParseException ex) {
@@ -795,7 +796,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
         
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             
-            con.setRequestMethod("GET");
+            con.setRequestMethod("DELETE");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             
@@ -803,6 +804,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
             
             con.getInputStream();
             
+            getPlansActionPerformed(evt);
         } catch (MalformedURLException | ProtocolException ex) {
             Logger.getLogger(SmartHouseClient.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -824,7 +826,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
         
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             
-            con.setRequestMethod("GET");
+            con.setRequestMethod("POST");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             
@@ -854,7 +856,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
         if (obj.containsKey("location")){
             String location = (String)obj.get("location");
             
-            String[] locs = location.split(",");
+            String[] locs = location.split(", ");
             this.addressTextField.setText(locs[0]);
             this.cityTextField.setText(locs[1]);
         }
@@ -877,10 +879,6 @@ public class SmartHouseClient extends javax.swing.JFrame {
         this.yearChoice.select(cal.get(Calendar.YEAR)-year);
         this.monthChoice.select(cal.get(Calendar.MONTH));
         this.dayChoice.select(cal.get(Calendar.DAY_OF_MONTH) - 1);
-        
-//        System.out.println((time/(1000*60))%(1440));        
-        
-        System.out.println(time);
         
         planHrs.select(cal.get(Calendar.HOUR_OF_DAY));
         planMins.select(cal.get(Calendar.MINUTE));
@@ -936,7 +934,7 @@ public class SmartHouseClient extends javax.swing.JFrame {
         
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             
-            con.setRequestMethod("GET");
+            con.setRequestMethod("PUT");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             
@@ -951,6 +949,9 @@ public class SmartHouseClient extends javax.swing.JFrame {
             
             if (!good) {
                 Error err = new Error(this, true, "You can't make it to this!");
+            }
+            else {
+                getPlansActionPerformed(evt);
             }
             
         } catch (MalformedURLException | ProtocolException | ParseException ex) {

@@ -19,7 +19,10 @@ import javax.jms.Queue;
 import javax.jms.TextMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -46,7 +49,7 @@ public class PlanerPage {
     @Resource(lookup="PlanerResponseQ")
     private Queue responseQueue;
     
-    @GET
+    @POST
     @Path("create")
     public Response Create(ContainerRequestContext requestContext, @QueryParam("duration") int duration,
                              @QueryParam("name") String name,
@@ -155,7 +158,7 @@ public class PlanerPage {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
     
-    @GET
+    @PUT
     @Path("update")
     public Response Update(ContainerRequestContext requestContext, @QueryParam("id") int id,
                            @QueryParam("duration") int duration,
@@ -222,7 +225,7 @@ public class PlanerPage {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
     
-    @GET
+    @DELETE
     @Path("delete")
     public Response Delete(ContainerRequestContext requestContext, @QueryParam("id") int id){
         
@@ -257,7 +260,7 @@ public class PlanerPage {
         return Response.status(Response.Status.OK).build();
     }
     
-    @GET
+    @POST
     @Path("alarm")
     public Response Alarm(ContainerRequestContext requestContext, @QueryParam("id") int id){
         

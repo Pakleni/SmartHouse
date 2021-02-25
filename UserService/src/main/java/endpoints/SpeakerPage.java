@@ -20,6 +20,7 @@ import javax.jms.TextMessage;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -46,7 +47,7 @@ public class SpeakerPage {
     @Resource(lookup="SpeakerResponseQ")
     private Queue historyQueue;
     
-    @GET
+    @POST
     @Path("play/{query}")
     public Response PlaySong(ContainerRequestContext requestContext, @PathParam("query") String query){
         

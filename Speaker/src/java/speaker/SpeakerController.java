@@ -34,7 +34,7 @@ import org.json.simple.parser.ParseException;
  *
  * @author pakleni
  */
-public class SpeakerController {
+public class SpeakerController extends Thread{
     
    
     @Resource(lookup="jms/__defaultConnectionFactory")
@@ -46,7 +46,7 @@ public class SpeakerController {
     @Resource(lookup="SpeakerResponseQ")
     private static Queue historyQueue;
     
-    private static void sendHistory(int userID) {
+    private void sendHistory(int userID) {
         
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("SpeakerPU");
         EntityManager em = emf.createEntityManager();
@@ -88,7 +88,7 @@ public class SpeakerController {
         }
     }
     
-    private static void saveToHistory(int userID, String query) {
+    private void saveToHistory(int userID, String query) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("SpeakerPU");
         EntityManager em = emf.createEntityManager();
 
@@ -115,7 +115,12 @@ public class SpeakerController {
         }
     }
     
-    public static void main(String[] args) {
+    private void playSong(String query) {
+        Player.getInstance().searchAndPlay(query);
+    }
+    
+    @Override
+    public void run() {
         JMSContext context=connectionFactory.createContext();
         JMSConsumer consumer=context.createConsumer(myQueue);
         
@@ -136,7 +141,7 @@ public class SpeakerController {
                         if (obj.containsKey("query")) {
                             String query = (String)obj.get("query");
 
-                            Player.searchAndPlay(query);
+                            playSong(query);
 
                             saveToHistory(userID, query);
                             
@@ -146,14 +151,28 @@ public class SpeakerController {
                         sendHistory(userID);
                     }
                     
-                } catch (JMSException ex) {
-                    Logger.getLogger(SpeakerController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
+                } catch (JMSException | ParseException ex) {
                     Logger.getLogger(SpeakerController.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             }
         }
+    }
+    
+    protected SpeakerController(){}
+    
+    private static SpeakerController singleton = null;
+    
+    public static SpeakerController getInstance() {
+        if (singleton == null){
+            singleton = new SpeakerController();
+        }
+        
+        return singleton;
+    }
+            
+    public static void main(String[] args) {
+        getInstance().start();
     }
     
 }

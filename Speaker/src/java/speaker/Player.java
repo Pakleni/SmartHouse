@@ -29,7 +29,7 @@ import org.json.simple.parser.ParseException;
  * @author pakleni
  */
 public class Player {
-    private static boolean openWebpage(URI uri) {
+    private boolean openWebpage(URI uri) {
         Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
         if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
             try {
@@ -42,7 +42,7 @@ public class Player {
         return false;
     }
 
-    private static boolean openWebpage(URL url) {
+    private boolean openWebpage(URL url) {
         try {
             return openWebpage(url.toURI());
         } catch (URISyntaxException e) {
@@ -51,7 +51,7 @@ public class Player {
         return false;
     }
     
-    private static boolean openWebpage(String urlString){
+    private boolean openWebpage(String urlString){
         try {
             URL url = new URL (urlString);
             openWebpage(url);
@@ -62,7 +62,7 @@ public class Player {
         }
     }
             
-    private static String search(String q) {
+    private String search(String q) {
         URL url;
         try {
             String link = "http://api.deezer.com/search?q=" + URLEncoder.encode(q, "UTF-8");
@@ -98,7 +98,7 @@ public class Player {
         return "NO";
     }
     
-    static void searchAndPlay(String query) {
+    void searchAndPlay(String query) {
         String res = search(query);
         
         if (res.equals("NO")) {
@@ -108,5 +108,15 @@ public class Player {
         
         
         openWebpage(res);
+    }
+
+    private static Player singleton = null;
+    
+    public static Player getInstance() {
+        if (singleton == null){
+            singleton = new Player();
+        }
+        
+        return singleton;
     }
 }

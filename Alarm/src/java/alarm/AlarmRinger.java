@@ -33,7 +33,19 @@ import org.json.simple.JSONObject;
  */
 public class AlarmRinger extends Thread{
     
-    private static void ring (int user, EntityManager em) {
+    protected AlarmRinger(){}
+    
+    private static AlarmRinger singleton = null;
+    
+    public static AlarmRinger getInstance(){
+        if (singleton == null) {
+            singleton = new AlarmRinger();
+        }
+        
+        return singleton;
+    }
+    
+    private void ring (int user) {
         AlarmSound sound = em.find(AlarmSound.class, user);
         
         if (sound == null) {
@@ -44,7 +56,7 @@ public class AlarmRinger extends Thread{
         ring (user, sound.getQuery());
     }
     
-    private static void ring(int user, String query) {
+    private void ring(int user, String query) {
         try {
             JMSContext context= AlarmController.connectionFactory.createContext();
             JMSProducer producer = context.createProducer();
@@ -65,7 +77,7 @@ public class AlarmRinger extends Thread{
         }
     }
     
-    private static void executeAlarms(EntityManager em) {
+    private void executeAlarms() {
         LocalTime time = java.time.LocalTime.now();
         
         int h = time.getHour();
@@ -80,7 +92,7 @@ public class AlarmRinger extends Thread{
         List<Alarm> alarms = query.getResultList();
         
         for (Alarm alarm: alarms) {
-            ring(alarm.getIdUsers(), em);
+            ring(alarm.getIdUsers());
         }
         
         try{
@@ -103,7 +115,7 @@ public class AlarmRinger extends Thread{
         }
     }
     
-    private static void executeDatedAlarms(EntityManager em) {
+    private void executeDatedAlarms() {
         long millis=System.currentTimeMillis() / (60 * 1000) * (60 * 1000);
         
         java.util.Date date=new java.util.Date(millis);
@@ -116,7 +128,7 @@ public class AlarmRinger extends Thread{
         List<DatedAlarm> alarms = query.getResultList();
         
         for (DatedAlarm alarm: alarms) {
-            ring(alarm.getIdUsers(), em);
+            ring(alarm.getIdUsers());
         }
         
         try{
@@ -139,14 +151,18 @@ public class AlarmRinger extends Thread{
         
     }
     
+    private EntityManagerFactory emf;
+
+    private EntityManager em;
+    
     @Override
     public void run() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("AlarmPU");
-        EntityManager em = emf.createEntityManager();
-        
+        emf = Persistence.createEntityManagerFactory("AlarmPU");
+        em = emf.createEntityManager();
+                
         while (!Thread.interrupted()) {
-            executeAlarms(em);
-            executeDatedAlarms(em);
+            executeAlarms();
+            executeDatedAlarms();
             
             try {
                 Thread.sleep(60001 - (System.currentTimeMillis()) % 60000);
@@ -160,8 +176,6 @@ public class AlarmRinger extends Thread{
     }
     
     public static void main(String[] args) {
-        AlarmRinger ar= new AlarmRinger();
-        
-        ar.start();
+        AlarmRinger.getInstance().start();
     }
 }
